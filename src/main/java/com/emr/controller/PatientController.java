@@ -62,5 +62,4 @@ public class PatientController {
                 })
                 .orElse(ResponseEntity.notFound().build());
     }
-
 }

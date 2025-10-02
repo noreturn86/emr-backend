@@ -6,6 +6,9 @@ import java.lang.annotation.Inherited;
 import java.util.List;
 import java.time.LocalDate;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
+
 
 @Entity
 @Table(name = "patients")
@@ -14,26 +17,29 @@ public class Patient{
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "first_name", nullable = false, length = 100)
+    @Column(name = "first_name", nullable = false)
     private String firstName;
     
-    @Column(name = "last_name", nullable = false, length = 100)
+    @Column(name = "last_name", nullable = false)
     private String lastName;
     
     @Column(nullable = false)
     private LocalDate dob;
     
-    @Column(name = "health_card_number", nullable = false, length = 100, unique = true)
+    @Column(name = "health_card_number", nullable = false, unique = true)
     private String healthCardNumber;
     
-    @Column(nullable = false, length = 20)
+    @Column(nullable = false)
     private String sex;
 
-    @Column(name = "phone_number", length = 50)
+    @Column(name = "phone_number")
     private String phoneNumber;
 
-    @Column(name = "email", length = 50)
     private String email;
+
+    @OneToMany(mappedBy = "patient", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<LabResult> labResults;
+
 
 
     public Patient() {}
