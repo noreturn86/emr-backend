@@ -2,6 +2,7 @@ package com.emr.controller;
 
 import com.emr.model.Patient;
 import com.emr.repository.PatientRepository;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.http.ResponseEntity;
@@ -18,6 +19,11 @@ public class PatientController {
     public List<Patient> getAllPatients() {
         return patientRepository.findAll();
     }
+    @PostMapping
+    public Patient createPatient(@RequestBody Patient patient) {
+        return patientRepository.save(patient);
+    }
+
 
     @GetMapping("/{id}")
     public ResponseEntity<Patient> getPatientById(@PathVariable Long id) {

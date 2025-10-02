@@ -5,7 +5,9 @@ CREATE TABLE patients (
     last_name VARCHAR(100) NOT NULL,
     dob DATE NOT NULL,
     health_card_number VARCHAR(50) UNIQUE NOT NULL,
-    sex VARCHAR(20)
+    sex VARCHAR(20) NOT NULL,
+    phone_number VARCHAR(50),
+    email VARCHAR(50)
 );
 
 -- Medical conditions
