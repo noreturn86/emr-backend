@@ -20,6 +20,7 @@ public class PatientController {
     public List<Patient> getAllPatients() {
         return patientRepository.findAll();
     }
+    
     @PostMapping
     public Patient createPatient(@RequestBody Patient patient) {
         return patientRepository.save(patient);
