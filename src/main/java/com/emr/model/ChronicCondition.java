@@ -2,6 +2,9 @@ package com.emr.model;
 
 import jakarta.persistence.*;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+
 
 @Entity
 @Table(name="medical_conditions")
@@ -12,7 +15,7 @@ public class ChronicCondition {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "patient_id", nullable = false)
-    @JsonIgnore
+    @JsonBackReference
     private Patient patient;
 
     @Column(name = "condition_name", nullable = false)

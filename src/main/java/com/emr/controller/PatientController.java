@@ -2,23 +2,41 @@ package com.emr.controller;
 
 import com.emr.model.Patient;
 import com.emr.repository.PatientRepository;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.http.ResponseEntity;
-
 import java.util.List;
 import java.util.Map;
+
+import com.emr.dto.PatientSummaryDTO;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+
+
 
 @RestController
 @RequestMapping("/patients")
 public class PatientController {
     @Autowired
-    private PatientRepository patientRepository;
+    private final PatientRepository patientRepository;
+    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+
+    public PatientController(PatientRepository patientRepository) {
+        this.patientRepository = patientRepository;
+    }
 
     @GetMapping
-    public List<Patient> getAllPatients() {
-        return patientRepository.findAll();
+    public List<PatientSummaryDTO> getAllPatients() {
+        return patientRepository.findAll().stream()
+            .map(p -> new PatientSummaryDTO(
+                p.getId(),
+                p.getFirstName(),
+                p.getLastName(),
+                p.getDob().format(formatter),
+                p.getHealthCardNumber(),
+                p.getSex()
+            ))
+            .toList();
     }
     
     @PostMapping
