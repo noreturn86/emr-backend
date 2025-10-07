@@ -19,7 +19,8 @@ import java.time.format.DateTimeFormatter;
 public class PatientController {
     @Autowired
     private final PatientRepository patientRepository;
-    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+    
+    private DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
     public PatientController(PatientRepository patientRepository) {
         this.patientRepository = patientRepository;

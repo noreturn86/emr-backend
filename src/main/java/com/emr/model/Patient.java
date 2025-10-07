@@ -1,10 +1,12 @@
 package com.emr.model;
+
 import jakarta.persistence.*;
 import java.lang.annotation.Inherited;
 import java.util.ArrayList;
 import java.util.List;
 import java.time.LocalDate;
 import com.emr.model.ChronicCondition;
+import com.emr.model.ConsultantLetter;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 
@@ -41,6 +43,10 @@ public class Patient{
     @OneToMany(mappedBy = "patient", cascade = CascadeType.ALL, orphanRemoval= true, fetch = FetchType.LAZY)
     @JsonManagedReference
     private List<ChronicCondition> chronicConditions = new ArrayList<>();
+
+    @OneToMany(mappedBy = "patient", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    @JsonManagedReference
+    private List<ConsultantLetter> consultantLetters = new ArrayList<>();
 
     public Patient() {}
     public Patient(String firstName, String lastName, LocalDate dob, String healthCardNumber, String sex, String phoneNumber, String email) {
