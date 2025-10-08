@@ -55,8 +55,21 @@ CREATE TABLE encounters (
     patient_id INT NOT NULL REFERENCES patients(id) ON DELETE CASCADE,
     provider_id INT REFERENCES providers(id) ON DELETE SET NULL,
     encounter_date TIMESTAMP NOT NULL,
+    note_text TEXT,
     summary TEXT
 );
+
+-- Encounter notes
+CREATE TABLE encounter_notes (
+    id SERIAL PRIMARY KEY,
+    encounter_id BIGINT NOT NULL,
+    note_text TEXT,
+    CONSTRAINT fk_encounter
+        FOREIGN KEY (encounter_id)
+        REFERENCES encounters(id)
+        ON DELETE CASCADE
+);
+
 
 -- Consultant letters
 CREATE TABLE consultant_letters (

@@ -48,6 +48,10 @@ public class Patient{
     @JsonManagedReference
     private List<ConsultantLetter> consultantLetters = new ArrayList<>();
 
+    @OneToMany(mappedBy = "patient", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    @JsonManagedReference
+    private List<Encounter> encounters = new ArrayList<>();
+
     public Patient() {}
     public Patient(String firstName, String lastName, LocalDate dob, String healthCardNumber, String sex, String phoneNumber, String email) {
         this.firstName = firstName;

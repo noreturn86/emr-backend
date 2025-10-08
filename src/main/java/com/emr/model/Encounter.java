@@ -9,17 +9,17 @@ import com.fasterxml.jackson.annotation.JsonBackReference;
 
 
 @Entity
-@Table(name = "consultant_letters")
-public class ConsultantLetter {
+@Table(name = "encounters")
+public class Encounter {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "letter_date", nullable = false)
-    private LocalDate letterDate;
+    @Column(name = "provider_id", nullable = false)
+    private int providerId;
 
-    @Column(name = "specialist_type", nullable = false)
-    private String specialistType;
+    @Column(name = "encounter_date", nullable = false)
+    private LocalDate encounterDate;
 
     private String summary;
 
@@ -28,20 +28,18 @@ public class ConsultantLetter {
     @JsonBackReference
     private Patient patient;
 
-
     //constructors
-    public ConsultantLetter() {}
+    public Encounter() {}
 
     //getters and setters
     public Long getId() { return id; }
-    public LocalDate getLetterDate() { return letterDate; }
-    public String getSpecialistType() { return specialistType; }
-    public String getSummary() { return summary; }
-    public Patient getPatient() { return patient; }
-
     public void setId(Long id) { this.id = id; }
-    public void setLetterDate(LocalDate letterDate) { this.letterDate = letterDate; }
-    public void setSpecialistType(String specialistType) { this.specialistType = specialistType; }
+    public int getProviderId() { return providerId; }
+    public void setProviderId(int providerId) { this.providerId = providerId; }
+    public LocalDate getEncounterDate() { return encounterDate; }
+    public void setEncounterDate(LocalDate encounterDate) { this.encounterDate = encounterDate; }
+    public String getSummary() { return summary; }
     public void setSummary(String summary) { this.summary = summary; }
+    public Patient getPatient() { return patient; }
     public void setPatient(Patient patient) { this.patient = patient; }
 }
