@@ -24,6 +24,12 @@ CREATE TABLE allergies (
     information VARCHAR(255) NOT NULL
 );
 
+-- Prescription sentences
+CREATE TABLE prescription_sentences (
+    id SERIAL PRIMARY KEY,
+    script_text TEXT NOT NULL
+);
+
 -- Medications
 CREATE TABLE medications (
     id SERIAL PRIMARY KEY,
