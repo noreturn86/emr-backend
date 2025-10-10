@@ -86,6 +86,17 @@ CREATE TABLE consultant_letters (
     summary TEXT
 );
 
+-- Imaging reports
+CREATE TABLE imaging_reports (
+    id SERIAL PRIMARY KEY,
+    patient_id INTEGER NOT NULL,
+    date DATE NOT NULL,
+    test_type VARCHAR(50) NOT NULL,
+    result_summary TEXT,
+    FOREIGN KEY (patient_id) REFERENCES patients(id)
+);
+
+
 -- Test reports
 CREATE TABLE test_reports (
     id SERIAL PRIMARY KEY,
