@@ -3,7 +3,7 @@ package com.emr.model;
 import jakarta.persistence.*;
 import java.time.LocalDate;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonBackReference;
 
 @Entity
 @Table(name = "lab_results")
@@ -25,7 +25,7 @@ public class LabResult {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "patient_id", nullable = false)
-    @JsonIgnore
+    @JsonBackReference
     private Patient patient;
 
 

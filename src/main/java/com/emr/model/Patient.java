@@ -8,6 +8,8 @@ import java.time.LocalDate;
 import com.emr.model.ChronicCondition;
 import com.emr.model.ConsultantLetter;
 import com.emr.model.Medication;
+import com.emr.model.ImagingReport;
+import com.emr.model.LabResult;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 
@@ -38,9 +40,6 @@ public class Patient{
 
     private String email;
 
-    @OneToMany(mappedBy = "patient", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<LabResult> labResults;
-
     @OneToMany(mappedBy = "patient", cascade = CascadeType.ALL, orphanRemoval= true, fetch = FetchType.LAZY)
     @JsonManagedReference
     private List<ChronicCondition> chronicConditions = new ArrayList<>();
@@ -56,6 +55,19 @@ public class Patient{
     @OneToMany(mappedBy = "patient", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     @JsonManagedReference
     private List<Medication> medications = new ArrayList<>();
+
+    @OneToMany(mappedBy = "patient", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    @JsonManagedReference
+    private List<ImagingReport> imagingReports = new ArrayList<>();
+
+    @OneToMany(mappedBy = "patient", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    @JsonManagedReference
+    private List<LabResult> labResults = new ArrayList<>();
+
+    @OneToMany(mappedBy = "patient", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    @JsonManagedReference
+    private List<ExamData> examData = new ArrayList<>();
+
 
     public Patient() {}
     public Patient(String firstName, String lastName, LocalDate dob, String healthCardNumber, String sex, String phoneNumber, String email) {

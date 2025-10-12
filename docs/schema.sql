@@ -47,6 +47,16 @@ CREATE TABLE lab_results (
     units VARCHAR(50)
 );
 
+-- Exam data
+CREATE TABLE exam_data (
+    id SERIAL PRIMARY KEY,
+    patient_id INT NOT NULL REFERENCES patients(id) ON DELETE CASCADE,
+    date DATE NOT NULL,
+	data_type VARCHAR(50),
+    value NUMERIC NOT NULL,
+    units VARCHAR(50)
+);
+
 -- Providers
 CREATE TABLE providers (
     id SERIAL PRIMARY KEY,
