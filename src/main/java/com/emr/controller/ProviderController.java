@@ -3,6 +3,8 @@ package com.emr.controller;
 import com.emr.model.Provider;
 import com.emr.repository.ProviderRepository;
 
+import com.emr.security.ProviderDetails;
+
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
@@ -11,6 +13,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+
 
 @RestController
 @RequestMapping("/api")
@@ -23,6 +27,11 @@ public class ProviderController {
     public ProviderController(ProviderRepository providerRepository) {
         this.providerRepository = providerRepository;
         this.passwordEncoder = new BCryptPasswordEncoder();
+    }
+
+    @GetMapping("/me")
+    public Provider getMyInfo(@AuthenticationPrincipal ProviderDetails details) {
+        return details.getProvider();
     }
 
     @PostMapping("/register-provider")
@@ -59,42 +68,4 @@ public class ProviderController {
                 .body("{\"username\": \"" + provider.getEmail() + "\"}");
     }
 
-
-    @PostMapping("/login-provider")
-    public ResponseEntity<?> loginProvider(@RequestBody Map<String, String> loginData) {
-        try {
-            String email = loginData.get("email");
-            String password = loginData.get("password");
-
-            if (email == null || password == null) {
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                        .body(Map.of("message", "Email and password are required"));
-            }
-
-            Optional<Provider> optionalProvider = providerRepository.findByEmail(email);
-
-            if (optionalProvider.isEmpty()) {
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                        .body(Map.of("message", "Invalid email or password"));
-            }
-
-            Provider provider = optionalProvider.get();
-
-            if (!passwordEncoder.matches(password, provider.getPassword())) {
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                        .body(Map.of("message", "Invalid email or password"));
-            }
-
-            Map<String, String> response = new HashMap<>();
-            response.put("username", provider.getEmail());
-            response.put("role", "provider");
-
-            return ResponseEntity.ok(response);
-
-        } catch (Exception e) {
-            e.printStackTrace();
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(Map.of("message", "Internal server error"));
-        }
-    }
 }

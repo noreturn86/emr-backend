@@ -118,3 +118,14 @@ CREATE TABLE test_reports (
     test_type VARCHAR(100) NOT NULL,
     summary TEXT
 );
+
+
+CREATE TABLE slots (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    slot_date DATE NOT NULL,
+    slot_time VARCHAR(10) NOT NULL,
+    provider_id INT NOT NULL,
+    patient_id INT,
+    FOREIGN KEY (provider_id) REFERENCES providers(id),
+    FOREIGN KEY (patient_id) REFERENCES patients(id)
+);
