@@ -67,5 +67,4 @@ public class ProviderController {
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body("{\"username\": \"" + provider.getEmail() + "\"}");
     }
-
 }

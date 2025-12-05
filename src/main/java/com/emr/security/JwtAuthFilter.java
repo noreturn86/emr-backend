@@ -14,7 +14,7 @@ import java.io.IOException;
 
 @Component
 @RequiredArgsConstructor
-public class JwtAuthFilter extends OncePerRequestFilter {  // ✅ extend OncePerRequestFilter
+public class JwtAuthFilter extends OncePerRequestFilter {
 
     private final JwtService jwtService;
     private final ProviderDetailsService providerDetailsService;
@@ -26,25 +26,40 @@ public class JwtAuthFilter extends OncePerRequestFilter {  // ✅ extend OncePer
             throws ServletException, IOException {
 
         String authHeader = request.getHeader("Authorization");
+
         if (authHeader == null || !authHeader.startsWith("Bearer ")) {
             filterChain.doFilter(request, response);
             return;
         }
 
         String token = authHeader.substring(7);
+
+        // validate JWT
         if (!jwtService.isValid(token)) {
-            filterChain.doFilter(request, response);
-            return;
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            return; // stop filter chain if token invalid
         }
 
-        String email = jwtService.extractEmail(token);
-        ProviderDetails providerDetails = providerDetailsService.loadUserByUsername(email);
+        try {
+            String email = jwtService.extractEmail(token);
 
-        UsernamePasswordAuthenticationToken authToken =
-                new UsernamePasswordAuthenticationToken(
-                        providerDetails, null, providerDetails.getAuthorities()
-                );
-        SecurityContextHolder.getContext().setAuthentication(authToken);
+            // load user details from DB
+            ProviderDetails providerDetails = providerDetailsService.loadUserByUsername(email);
+
+            // create authentication object
+            UsernamePasswordAuthenticationToken authToken =
+                    new UsernamePasswordAuthenticationToken(
+                            providerDetails,
+                            null,
+                            providerDetails.getAuthorities()
+                    );
+
+            SecurityContextHolder.getContext().setAuthentication(authToken);
+
+        } catch (Exception e) {
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            return;
+        }
 
         filterChain.doFilter(request, response);
     }

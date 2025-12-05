@@ -17,6 +17,7 @@ public class JwtService {
         return Keys.hmacShaKeyFor(SECRET.getBytes());
     }
 
+    // generate token for a user email
     public String generateToken(String email) {
         return Jwts.builder()
                 .setSubject(email)
@@ -26,19 +27,22 @@ public class JwtService {
                 .compact();
     }
 
+    // extract email (subject) from token
     public String extractEmail(String token) {
         return parse(token).getBody().getSubject();
     }
 
+    // validate token (expiration + signature)
     public boolean isValid(String token) {
         try {
-            parse(token);
-            return true;
-        } catch (Exception e) {
+            Jws<Claims> claims = parse(token);
+            return !claims.getBody().getExpiration().before(new Date());
+        } catch (JwtException | IllegalArgumentException e) {
             return false;
         }
     }
 
+    // parse token
     private Jws<Claims> parse(String token) {
         return Jwts.parserBuilder()
                 .setSigningKey(getSigningKey())

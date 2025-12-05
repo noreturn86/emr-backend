@@ -3,6 +3,11 @@ package com.emr.model;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.emr.model.Slot;
+import java.util.List;
+import java.util.ArrayList;
+
 @Entity
 @Table(name = "providers")
 public class Provider {
@@ -25,6 +30,11 @@ public class Provider {
 
     @Column(name = "credential_type")
     private String credentialType;
+
+    @OneToMany(mappedBy = "provider", cascade = CascadeType.ALL, orphanRemoval= true, fetch = FetchType.LAZY)
+    @JsonManagedReference
+    private List<Slot> slots = new ArrayList<>();
+
 
     //constructors
     public Provider() {}
