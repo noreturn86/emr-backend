@@ -22,31 +22,15 @@ public class SlotController {
     private ProviderRepository providerRepository;
 
     // 1. Get all slots for a provider on a specific date
-    @GetMapping("/provider/day")
-    public List<Slot> getSlotsForProviderByDate(
-        @RequestParam Long providerId,
-        @RequestParam Date date
-    ) {
+    @GetMapping("/provider")
+    public List<Slot> getSlotsForProvider(@RequestParam Long providerId) {
+
     Provider provider = providerRepository.findById(providerId)
             .orElseThrow(() -> new RuntimeException("Provider not found"));
 
-    // Compute start/end of the day
-    Calendar cal = Calendar.getInstance();
-    cal.setTime(date);
-    cal.set(Calendar.HOUR_OF_DAY, 0);
-    cal.set(Calendar.MINUTE, 0);
-    cal.set(Calendar.SECOND, 0);
-    cal.set(Calendar.MILLISECOND, 0);
-    Date startOfDay = cal.getTime();
-
-    cal.set(Calendar.HOUR_OF_DAY, 23);
-    cal.set(Calendar.MINUTE, 59);
-    cal.set(Calendar.SECOND, 59);
-    cal.set(Calendar.MILLISECOND, 999);
-    Date endOfDay = cal.getTime();
-
-    return slotRepository.findByProviderAndDatetimeBetween(provider, startOfDay, endOfDay);
+    return slotRepository.findByProvider(provider);
 }
+
 
 
     // 2. Add a new slot for a provider with null patientId

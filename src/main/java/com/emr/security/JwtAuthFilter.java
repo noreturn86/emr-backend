@@ -28,25 +28,32 @@ public class JwtAuthFilter extends OncePerRequestFilter {
         String authHeader = request.getHeader("Authorization");
 
         if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+            System.out.println("⛔ No Bearer token");
             filterChain.doFilter(request, response);
             return;
         }
 
         String token = authHeader.substring(7);
+        System.out.println("🔍 Token received: " + token);
 
-        // validate JWT
+        // Validate token signature + expiration
         if (!jwtService.isValid(token)) {
+            System.out.println("⛔ Token invalid");
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-            return; // stop filter chain if token invalid
+            return;
         }
 
         try {
             String email = jwtService.extractEmail(token);
+            System.out.println("🔐 Extracted email: " + email);
 
-            // load user details from DB
-            ProviderDetails providerDetails = providerDetailsService.loadUserByUsername(email);
+            // Load provider from DB
+            ProviderDetails providerDetails =
+                    providerDetailsService.loadUserByUsername(email);
 
-            // create authentication object
+            System.out.println("✅ Loaded provider: " + providerDetails.getUsername());
+
+            // Create Spring Security authentication object
             UsernamePasswordAuthenticationToken authToken =
                     new UsernamePasswordAuthenticationToken(
                             providerDetails,
@@ -54,13 +61,18 @@ public class JwtAuthFilter extends OncePerRequestFilter {
                             providerDetails.getAuthorities()
                     );
 
+            // Save authentication in the security context
             SecurityContextHolder.getContext().setAuthentication(authToken);
 
+            System.out.println("✅ Authentication stored in SecurityContext");
+
         } catch (Exception e) {
+            System.out.println("⛔ Authentication error: " + e.getMessage());
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
             return;
         }
 
+        // Continue request
         filterChain.doFilter(request, response);
     }
 }

@@ -10,7 +10,5 @@ import java.util.List;
 
 @Repository
 public interface SlotRepository extends JpaRepository<Slot, Long> {
-
-    // Find all slots for a given provider between two datetimes
-    List<Slot> findByProviderAndDatetimeBetween(Provider provider, Date start, Date end);
+    List<Slot> findByProvider(Provider provider);
 }
