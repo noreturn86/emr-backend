@@ -9,9 +9,11 @@ import java.util.List;
 import java.util.Map;
 
 import com.emr.dto.PatientSummaryDTO;
+import com.emr.dto.PatientFullDTO;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 
+import com.emr.mapper.PatientMapper;
 
 
 @RestController
@@ -65,9 +67,20 @@ public class PatientController {
                     if (updates.containsKey("phoneNumber")) {
                         patient.setPhoneNumber(updates.get("phoneNumber"));
                     }
-                    // Add more fields here if needed
                     Patient updated = patientRepository.save(patient);
                     return ResponseEntity.ok(updated);
+                })
+                .orElse(ResponseEntity.notFound().build());
+    }
+
+
+    @GetMapping("/full/{id}")
+    public ResponseEntity<PatientFullDTO> getPatientFull(@PathVariable Long id) {
+        return patientRepository.findById(id)
+                .map(patient -> {
+                    //mapper converts Patient -> PatientFullDTO
+                    PatientFullDTO dto = PatientMapper.toFullDTO(patient);
+                    return ResponseEntity.ok(dto);
                 })
                 .orElse(ResponseEntity.notFound().build());
     }

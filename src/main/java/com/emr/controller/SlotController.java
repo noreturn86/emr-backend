@@ -6,8 +6,8 @@ import com.emr.repository.SlotRepository;
 import com.emr.repository.ProviderRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
-import java.util.Calendar;
 import org.springframework.format.annotation.DateTimeFormat;
+
 import java.util.Date;
 import java.util.List;
 
@@ -21,32 +21,37 @@ public class SlotController {
     @Autowired
     private ProviderRepository providerRepository;
 
-    // 1. Get all slots for a provider on a specific date
+    // 1. Get all slots for a provider
     @GetMapping("/provider")
     public List<Slot> getSlotsForProvider(@RequestParam Long providerId) {
+        Provider provider = providerRepository.findById(providerId)
+                .orElseThrow(() -> new RuntimeException("Provider not found"));
 
-    Provider provider = providerRepository.findById(providerId)
-            .orElseThrow(() -> new RuntimeException("Provider not found"));
-
-    return slotRepository.findByProvider(provider);
-}
-
-
+        return slotRepository.findByProvider(provider);
+    }
 
     // 2. Add a new slot for a provider with null patientId
     @PostMapping("/add")
     public Slot addSlot(
-        @RequestParam Long providerId,
-        @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) Date datetime
+            @RequestParam Long providerId,
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) Date datetime
     ) {
         Provider provider = providerRepository.findById(providerId)
-            .orElseThrow(() -> new RuntimeException("Provider not found"));
+                .orElseThrow(() -> new RuntimeException("Provider not found"));
 
         Slot newSlot = new Slot();
         newSlot.setProvider(provider);
-        newSlot.setPatientId(null);
+        newSlot.setPatientId(null); // active but available
         newSlot.setDatetime(datetime);
 
         return slotRepository.save(newSlot);
+    }
+
+    // 3. Delete a slot by ID (used to make an available slot inactive)
+    @DeleteMapping("/{slotId}")
+    public void deleteSlot(@PathVariable Long slotId) {
+        Slot slot = slotRepository.findById(slotId)
+                .orElseThrow(() -> new RuntimeException("Slot not found"));
+        slotRepository.delete(slot);
     }
 }
