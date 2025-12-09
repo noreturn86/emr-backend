@@ -10,8 +10,9 @@ import java.util.Map;
 
 import com.emr.dto.PatientSummaryDTO;
 import com.emr.dto.PatientFullDTO;
-import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.http.HttpStatus;
 
 import com.emr.mapper.PatientMapper;
 
@@ -19,13 +20,50 @@ import com.emr.mapper.PatientMapper;
 @RestController
 @RequestMapping("/patients")
 public class PatientController {
+
     @Autowired
     private final PatientRepository patientRepository;
-    
     private DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+
+    private final BCryptPasswordEncoder passwordEncoder;
 
     public PatientController(PatientRepository patientRepository) {
         this.patientRepository = patientRepository;
+        this.passwordEncoder = new BCryptPasswordEncoder();
+    }
+
+    @PostMapping("/register-patient")
+    public ResponseEntity<?> registerPatient(@RequestBody(required = false) Patient patient) {
+        if (patient == null) {
+            System.out.println("Received null provider: JSON parsing failed or empty body");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body("{\"message\": \"Invalid or missing JSON body\"}");
+        }
+
+        System.out.println("Received provider: " +
+                "firstName=" + patient.getFirstName() +
+                ", lastName=" + patient.getLastName() +
+                ", email=" + patient.getEmail() +
+                ", password=" + (patient.getPassword() != null ? "*****" : null));
+
+        //validate required fields
+        if (patient.getFirstName() == null || patient.getLastName() == null ||
+            patient.getEmail() == null || patient.getPassword() == null) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body("{\"message\": \"Name, email, and password are required\"}");
+        }
+
+        if (patientRepository.findByEmail(patient.getEmail()).isPresent()) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body("{\"message\": \"Email already registered\"}");
+        }
+
+        patient.setPassword(passwordEncoder.encode(patient.getPassword()));
+
+        patientRepository.save(patient);
+
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body("{\"username\": \"" + patient.getEmail() + "\"}");
     }
 
     @GetMapping

@@ -30,6 +30,11 @@ public class SlotController {
         return slotRepository.findByProvider(provider);
     }
 
+    @GetMapping("/available")
+    public List<Slot> getAllAvailableSlots() {
+        return slotRepository.findByPatientIdIsNull();
+    }
+
     // 2. Add a new slot for a provider with null patientId
     @PostMapping("/add")
     public Slot addSlot(

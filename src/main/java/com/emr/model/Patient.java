@@ -6,6 +6,7 @@ import java.util.List;
 import java.time.LocalDate;
 
 import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 @Entity
 @Table(name = "patients")
@@ -33,6 +34,10 @@ public class Patient {
     private String phoneNumber;
 
     private String email;
+
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
+    private String password;
+
 
     @OneToMany(mappedBy = "patient", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     @JsonManagedReference
@@ -90,6 +95,8 @@ public class Patient {
     public void setPhoneNumber(String phoneNumber) { this.phoneNumber = phoneNumber; }
     public String getEmail() { return email; }
     public void setEmail(String email) { this.email = email; }
+    public String getPassword() { return password; }
+    public void setPassword(String password) { this.password = password; }
 
     public List<ChronicCondition> getChronicConditions() { return chronicConditions; }
     public void setChronicConditions(List<ChronicCondition> chronicConditions) { this.chronicConditions = chronicConditions; }
