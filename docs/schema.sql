@@ -3,11 +3,11 @@ CREATE TABLE patients (
     id SERIAL PRIMARY KEY,
     first_name VARCHAR(100) NOT NULL,
     last_name VARCHAR(100) NOT NULL,
-    dob DATE NOT NULL,
-    health_card_number VARCHAR(50) UNIQUE NOT NULL,
-    sex VARCHAR(20) NOT NULL,
+    dob DATE,
+    health_card_number VARCHAR(50) UNIQUE,
+    sex VARCHAR(20),
     phone_number VARCHAR(50),
-    email VARCHAR(50)
+    email VARCHAR(50) NOT NULL
 );
 
 -- Medical conditions

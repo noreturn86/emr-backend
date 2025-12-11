@@ -29,19 +29,23 @@ public class SecurityConfig {
             .cors(cors -> cors.configurationSource(corsConfigurationSource()))
             .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .authorizeHttpRequests(auth -> auth
-                // public routes
-                .requestMatchers("/api/login-provider").permitAll()
-                .requestMatchers("/api/test/**").permitAll()
+                // Public endpoints
+                .requestMatchers(
+                    "/patients/register-patient",
+                    "/api/login-provider",
+                    "/api/login-patient"
+                ).permitAll()
 
-                // allow preflight OPTIONS requests
+                // Preflight OPTIONS requests
                 .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
 
-                // patient routes require provider role
-                .requestMatchers("/api/patients/**").hasRole("PROVIDER")
+                // All other patient routes require authentication
+                .requestMatchers("/patients/**").authenticated()
 
-                // all other routes require authentication
+                // Everything else also authenticated
                 .anyRequest().authenticated()
             )
+
             // add JWT filter BEFORE Spring Security's authentication filter
             .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
 

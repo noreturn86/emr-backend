@@ -1,6 +1,7 @@
 package com.emr.controller;
 
 import com.emr.model.Provider;
+import com.emr.model.Patient;
 import com.emr.repository.ProviderRepository;
 import com.emr.repository.PatientRepository;
 import com.emr.security.JwtService;
@@ -19,7 +20,7 @@ public class LoginController {
     private final BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
 
     @PostMapping("/login-provider")
-    public LoginResponse login(@RequestBody LoginRequest req) {
+    public LoginResponse loginProvider(@RequestBody LoginRequest req) {
 
         Provider provider = providerRepository.findByEmail(req.email())
                 .orElseThrow(() -> new RuntimeException("Invalid email/password"));
@@ -29,12 +30,11 @@ public class LoginController {
         }
 
         String token = jwtService.generateToken(provider.getEmail());
-
         return new LoginResponse(token, provider);
     }
 
     @PostMapping("/login-patient")
-    public LoginResponse login(@RequestBody LoginRequest req) {
+    public PatientLoginResponse loginPatient(@RequestBody LoginRequest req) {
 
         Patient patient = patientRepository.findByEmail(req.email())
                 .orElseThrow(() -> new RuntimeException("Invalid email/password"));
@@ -44,13 +44,12 @@ public class LoginController {
         }
 
         String token = jwtService.generateToken(patient.getEmail());
-
-        return new LoginResponse(token, patient);
+        return new PatientLoginResponse(token, patient);
     }
 }
 
-record LoginRequest(String email, String password) {
-}
+record LoginRequest(String email, String password) {}
 
-record LoginResponse(String token, Patient patient) {
-}
+record LoginResponse(String token, Provider provider) {}
+
+record PatientLoginResponse(String token, Patient patient) {}

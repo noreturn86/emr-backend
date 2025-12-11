@@ -21,18 +21,17 @@ public class Patient {
     @Column(name = "last_name", nullable = false)
     private String lastName;
 
-    @Column(nullable = false)
     private LocalDate dob;
 
-    @Column(name = "health_card_number", nullable = false, unique = true)
+    @Column(name = "health_card_number", unique = true)
     private String healthCardNumber;
 
-    @Column(nullable = false)
     private String sex;
 
     @Column(name = "phone_number")
     private String phoneNumber;
 
+    @Column(nullable = false)
     private String email;
 
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
