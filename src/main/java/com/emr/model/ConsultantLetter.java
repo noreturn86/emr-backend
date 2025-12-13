@@ -21,6 +21,7 @@ public class ConsultantLetter {
     @Column(name = "specialist_type", nullable = false)
     private String specialistType;
 
+    @Column(length = 1000)
     private String summary;
 
     @ManyToOne(fetch = FetchType.LAZY)

@@ -7,7 +7,14 @@ CREATE TABLE patients (
     health_card_number VARCHAR(50) UNIQUE,
     sex VARCHAR(20),
     phone_number VARCHAR(50),
-    email VARCHAR(50) NOT NULL
+    email VARCHAR(50) NOT NULL,
+    password VARCHAR(255) NOT NULL
+    gender VARCHAR(255),
+    phone_secondary VARCHAR(255),
+    street_address VARCHAR(255),
+    city VARCHAR(50),
+    province VARCHAR(50),
+    postal_code VARCHAR(50)
 );
 
 -- Medical conditions

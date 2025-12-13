@@ -23,8 +23,8 @@ public class PatientMapper {
                 p.getLastName(),
                 p.getDob(),
                 p.getHealthCardNumber(),
-                p.getSex(),
-                p.getPhoneNumber(),
+                p.getSexAtBirth(),
+                p.getPhonePrimary(),
                 p.getEmail()
         );
     }
@@ -68,8 +68,8 @@ public class PatientMapper {
             p.getLastName(),
             p.getDob(),
             p.getHealthCardNumber(),
-            p.getSex(),
-            p.getPhoneNumber(),
+            p.getSexAtBirth(),
+            p.getPhonePrimary(),
             p.getEmail(),
             chronicConditionDTOs,
             consultantLetterDTOs,

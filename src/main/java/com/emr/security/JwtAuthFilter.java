@@ -1,10 +1,15 @@
 package com.emr.security;
 
+import com.emr.model.Patient;
+import com.emr.repository.PatientRepository;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import com.emr.security.PatientDetails;
+import com.emr.security.PatientDetailsService;
+
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
@@ -19,8 +24,10 @@ public class JwtAuthFilter extends OncePerRequestFilter {
 
     private final JwtService jwtService;
     private final ProviderDetailsService providerDetailsService;
+    private final PatientDetailsService patientDetailsService;
+    private final PatientRepository patientRepository;
 
-    // List of public endpoints that do NOT require a token
+    //public endpoints that do not require authentication
     private static final List<String> PUBLIC_URLS = List.of(
             "/patients/register-patient",
             "/api/login-provider",
@@ -35,7 +42,6 @@ public class JwtAuthFilter extends OncePerRequestFilter {
 
         String path = request.getRequestURI();
 
-        // Skip JWT validation for public URLs
         if (PUBLIC_URLS.contains(path) || request.getMethod().equalsIgnoreCase("OPTIONS")) {
             filterChain.doFilter(request, response);
             return;
@@ -44,51 +50,49 @@ public class JwtAuthFilter extends OncePerRequestFilter {
         String authHeader = request.getHeader("Authorization");
 
         if (authHeader == null || !authHeader.startsWith("Bearer ")) {
-            System.out.println("⛔ No Bearer token");
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
             return;
         }
 
         String token = authHeader.substring(7);
-        System.out.println("🔍 Token received: " + token);
 
-        // Validate token signature + expiration
         if (!jwtService.isValid(token)) {
-            System.out.println("⛔ Token invalid");
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
             return;
         }
 
         try {
             String email = jwtService.extractEmail(token);
-            System.out.println("🔐 Extracted email: " + email);
+            String role = jwtService.extractRole(token); // NEW: read role claim
 
-            // Load provider from DB
-            ProviderDetails providerDetails =
-                    providerDetailsService.loadUserByUsername(email);
+            Object userDetails;
 
-            System.out.println("✅ Loaded provider: " + providerDetails.getUsername());
+            if ("PROVIDER".equals(role)) {
+                userDetails = providerDetailsService.loadUserByUsername(email);
+            } else if ("PATIENT".equals(role)) {
+                Patient patient = patientRepository.findByEmail(email)
+                        .orElseThrow(() -> new RuntimeException("Patient not found"));
+                userDetails = new PatientDetails(patient); // create a PatientDetails class similar to ProviderDetails
+            } else {
+                throw new RuntimeException("Unknown role in JWT");
+            }
 
-            // Create Spring Security authentication object
             UsernamePasswordAuthenticationToken authToken =
                     new UsernamePasswordAuthenticationToken(
-                            providerDetails,
+                            userDetails,
                             null,
-                            providerDetails.getAuthorities()
+                            userDetails instanceof ProviderDetails
+                                    ? ((ProviderDetails) userDetails).getAuthorities()
+                                    : List.of() // patients may have no authorities
                     );
 
-            // Save authentication in the security context
             SecurityContextHolder.getContext().setAuthentication(authToken);
 
-            System.out.println("✅ Authentication stored in SecurityContext");
-
         } catch (Exception e) {
-            System.out.println("⛔ Authentication error: " + e.getMessage());
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
             return;
         }
 
-        // Continue request
         filterChain.doFilter(request, response);
     }
 }

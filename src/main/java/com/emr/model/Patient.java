@@ -1,12 +1,11 @@
 package com.emr.model;
 
-import jakarta.persistence.*;
-import java.util.ArrayList;
-import java.util.List;
-import java.time.LocalDate;
-
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import jakarta.persistence.*;
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "patients")
@@ -26,16 +25,32 @@ public class Patient {
     @Column(name = "health_card_number", unique = true)
     private String healthCardNumber;
 
-    private String sex;
+    @Column(name = "sex")
+    private String sexAtBirth;
 
     @Column(name = "phone_number")
-    private String phoneNumber;
+    private String phonePrimary;
 
     @Column(nullable = false)
     private String email;
 
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private String password;
+
+    private String gender;
+
+    @Column(name = "phone_secondary")
+    private String phoneSecondary;
+
+    @Column(name = "street_address")
+    private String streetAddress;
+
+    private String city;
+
+    private String province;
+
+    @Column(name = "postal_code")
+    private String postalCode;
 
 
     @OneToMany(mappedBy = "patient", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
@@ -68,13 +83,9 @@ public class Patient {
 
     public Patient() {}
 
-    public Patient(String firstName, String lastName, LocalDate dob, String healthCardNumber, String sex, String phoneNumber, String email) {
+    public Patient(String firstName, String lastName, String email) {
         this.firstName = firstName;
         this.lastName = lastName;
-        this.dob = dob;
-        this.healthCardNumber = healthCardNumber;
-        this.sex = sex;
-        this.phoneNumber = phoneNumber;
         this.email = email;
     }
 
@@ -88,14 +99,26 @@ public class Patient {
     public void setDob(LocalDate dob) { this.dob = dob; }
     public String getHealthCardNumber() { return healthCardNumber; }
     public void setHealthCardNumber(String healthCardNumber) { this.healthCardNumber = healthCardNumber; }
-    public String getSex() { return sex; }
-    public void setSex(String sex) { this.sex = sex; }
-    public String getPhoneNumber() { return phoneNumber; }
-    public void setPhoneNumber(String phoneNumber) { this.phoneNumber = phoneNumber; }
+    public String getSexAtBirth() { return sexAtBirth; } 
+    public void setSexAtBirth(String sexAtBirth) { this.sexAtBirth = sexAtBirth; }
+    public String getPhonePrimary() { return phonePrimary; } 
+    public void setPhonePrimary(String phonePrimary) { this.phonePrimary = phonePrimary; }
+
     public String getEmail() { return email; }
     public void setEmail(String email) { this.email = email; }
     public String getPassword() { return password; }
     public void setPassword(String password) { this.password = password; }
+    public String getGender() { return gender; } public void setGender(String gender) { this.gender = gender; }
+    public String getPhoneSecondary() { return phoneSecondary; } 
+    public void setPhoneSecondary(String phoneSecondary) { this.phoneSecondary = phoneSecondary; }
+    public String getStreetAddress() { return streetAddress; } 
+    public void setStreetAddress(String streetAddress) { this.streetAddress = streetAddress; }
+    public String getCity() { return city; } 
+    public void setCity(String city) { this.city = city; }
+    public String getProvince() { return province; } 
+    public void setProvince(String province) { this.province = province; }
+    public String getPostalCode() { return postalCode; } 
+    public void setPostalCode(String postalCode) { this.postalCode = postalCode; }
 
     public List<ChronicCondition> getChronicConditions() { return chronicConditions; }
     public void setChronicConditions(List<ChronicCondition> chronicConditions) { this.chronicConditions = chronicConditions; }

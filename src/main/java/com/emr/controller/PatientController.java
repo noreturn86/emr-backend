@@ -2,6 +2,9 @@ package com.emr.controller;
 
 import com.emr.model.Patient;
 import com.emr.repository.PatientRepository;
+
+import com.emr.dto.PatientAccountUpdateDTO;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.http.ResponseEntity;
@@ -53,6 +56,7 @@ public class PatientController {
                     .body("{\"message\": \"Name, email, and password are required\"}");
         }
 
+        //check if patient is already registered
         if (patientRepository.findByEmail(patient.getEmail()).isPresent()) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                     .body("{\"message\": \"Email already registered\"}");
@@ -75,7 +79,7 @@ public class PatientController {
                 p.getLastName(),
                 p.getDob().format(formatter),
                 p.getHealthCardNumber(),
-                p.getSex()
+                p.getSexAtBirth()
             ))
             .toList();
     }
@@ -84,6 +88,37 @@ public class PatientController {
     public Patient createPatient(@RequestBody Patient patient) {
         return patientRepository.save(patient);
     }
+
+    @PutMapping("/{id}/account")
+    public ResponseEntity<?> updatePatientAccount(
+            @PathVariable Long id,
+            @RequestBody PatientAccountUpdateDTO dto
+    ) {
+        Patient patient = patientRepository.findById(id).orElse(null);
+
+        if (patient == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body("{\"message\": \"Patient not found\"}");
+        }
+
+        // --- Update all allowed fields from the DTO ---
+        patient.setDob(dto.getDob());
+        patient.setHealthCardNumber(dto.getHealthCardNumber());
+        patient.setSexAtBirth(dto.getSexAtBirth());
+        patient.setGender(dto.getGender());
+        patient.setPhonePrimary(dto.getPhonePrimary());
+        patient.setPhoneSecondary(dto.getPhoneSecondary());
+        patient.setStreetAddress(dto.getStreetAddress());
+        patient.setCity(dto.getCity());
+        patient.setProvince(dto.getProvince());
+        patient.setPostalCode(dto.getPostalCode());
+
+        patientRepository.save(patient);
+
+        return ResponseEntity.ok().build();
+    }
+
+
 
     @GetMapping("/{id}")
     public ResponseEntity<Patient> getPatientById(@PathVariable Long id) {
@@ -103,7 +138,7 @@ public class PatientController {
                         patient.setEmail(updates.get("email"));
                     }
                     if (updates.containsKey("phoneNumber")) {
-                        patient.setPhoneNumber(updates.get("phoneNumber"));
+                        patient.setPhonePrimary(updates.get("phoneNumber"));
                     }
                     Patient updated = patientRepository.save(patient);
                     return ResponseEntity.ok(updated);

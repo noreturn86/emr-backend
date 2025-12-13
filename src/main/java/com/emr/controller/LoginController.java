@@ -29,7 +29,7 @@ public class LoginController {
             throw new RuntimeException("Invalid email/password");
         }
 
-        String token = jwtService.generateToken(provider.getEmail());
+        String token = jwtService.generateToken(provider.getEmail(), "PROVIDER");
         return new LoginResponse(token, provider);
     }
 
@@ -43,7 +43,7 @@ public class LoginController {
             throw new RuntimeException("Invalid email/password");
         }
 
-        String token = jwtService.generateToken(patient.getEmail());
+        String token = jwtService.generateToken(patient.getEmail(), "PATIENT");
         return new PatientLoginResponse(token, patient);
     }
 }

@@ -18,19 +18,32 @@ public class JwtService {
     }
 
     // generate token for a user email
-    public String generateToken(String email) {
+    public String generateToken(String email, String role) {
         return Jwts.builder()
                 .setSubject(email)
+                .claim("role", role)
                 .setIssuedAt(new Date())
                 .setExpiration(new Date(System.currentTimeMillis() + EXPIRATION))
                 .signWith(getSigningKey(), SignatureAlgorithm.HS256)
                 .compact();
     }
 
-    // extract email (subject) from token
+
+    //extract email (subject) from token
     public String extractEmail(String token) {
         return parse(token).getBody().getSubject();
     }
+
+    //extract role
+    public String extractRole(String token) {
+        return Jwts.parserBuilder()
+                .setSigningKey(getSigningKey())
+                .build()
+                .parseClaimsJws(token)
+                .getBody()
+                .get("role", String.class);      // read role claim
+    }
+
 
     // validate token (expiration + signature)
     public boolean isValid(String token) {
