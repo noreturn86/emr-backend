@@ -1,9 +1,11 @@
 package com.emr.controller;
 
 import com.emr.model.Slot;
+import com.emr.mapper.SlotMapper;
 import com.emr.model.Provider;
 import com.emr.repository.SlotRepository;
 import com.emr.repository.ProviderRepository;
+import com.emr.dto.AvailableSlotsDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -21,7 +23,7 @@ public class SlotController {
     @Autowired
     private ProviderRepository providerRepository;
 
-    // 1. Get all slots for a provider
+    //get all slots for a provider
     @GetMapping("/provider")
     public List<Slot> getSlotsForProvider(@RequestParam Long providerId) {
         Provider provider = providerRepository.findById(providerId)
@@ -30,12 +32,7 @@ public class SlotController {
         return slotRepository.findByProvider(provider);
     }
 
-    @GetMapping("/available")
-    public List<Slot> getAllAvailableSlots() {
-        return slotRepository.findByPatientIdIsNull();
-    }
-
-    // 2. Add a new slot for a provider with null patientId
+    //add a new slot for a provider with null patientId
     @PostMapping("/add")
     public Slot addSlot(
             @RequestParam Long providerId,
@@ -52,11 +49,20 @@ public class SlotController {
         return slotRepository.save(newSlot);
     }
 
-    // 3. Delete a slot by ID (used to make an available slot inactive)
+    //delete a slot by ID (null = slot unavailable)
     @DeleteMapping("/{slotId}")
     public void deleteSlot(@PathVariable Long slotId) {
         Slot slot = slotRepository.findById(slotId)
                 .orElseThrow(() -> new RuntimeException("Slot not found"));
         slotRepository.delete(slot);
+    }
+
+
+    @GetMapping("/available")
+    public List<AvailableSlotsDTO> getAllAvailableSlots() {
+        return slotRepository.findByPatientIdIsNull()
+                .stream()
+                .map(SlotMapper::toAvailableSlotDTO)
+                .toList();
     }
 }

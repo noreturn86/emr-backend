@@ -1,17 +1,13 @@
 package com.emr.security;
 
-import com.emr.model.Patient;
-import com.emr.repository.PatientRepository;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
-import com.emr.security.PatientDetails;
-import com.emr.security.PatientDetailsService;
-
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
@@ -25,9 +21,8 @@ public class JwtAuthFilter extends OncePerRequestFilter {
     private final JwtService jwtService;
     private final ProviderDetailsService providerDetailsService;
     private final PatientDetailsService patientDetailsService;
-    private final PatientRepository patientRepository;
 
-    //public endpoints that do not require authentication
+    // Public endpoints that do not require authentication
     private static final List<String> PUBLIC_URLS = List.of(
             "/patients/register-patient",
             "/api/login-provider",
@@ -42,6 +37,7 @@ public class JwtAuthFilter extends OncePerRequestFilter {
 
         String path = request.getRequestURI();
 
+        // Skip public endpoints
         if (PUBLIC_URLS.contains(path) || request.getMethod().equalsIgnoreCase("OPTIONS")) {
             filterChain.doFilter(request, response);
             return;
@@ -63,27 +59,22 @@ public class JwtAuthFilter extends OncePerRequestFilter {
 
         try {
             String email = jwtService.extractEmail(token);
-            String role = jwtService.extractRole(token); // NEW: read role claim
+            String role = jwtService.extractRole(token);
 
-            Object userDetails;
+            UserDetails userDetails;
 
-            if ("PROVIDER".equals(role)) {
-                userDetails = providerDetailsService.loadUserByUsername(email);
-            } else if ("PATIENT".equals(role)) {
-                Patient patient = patientRepository.findByEmail(email)
-                        .orElseThrow(() -> new RuntimeException("Patient not found"));
-                userDetails = new PatientDetails(patient); // create a PatientDetails class similar to ProviderDetails
-            } else {
-                throw new RuntimeException("Unknown role in JWT");
+            switch (role) {
+                case "PROVIDER" -> userDetails = providerDetailsService.loadUserByUsername(email);
+                case "PATIENT" -> userDetails = patientDetailsService.loadUserByUsername(email);
+                default -> throw new RuntimeException("Unknown role in JWT");
             }
 
+            // Set authentication in Spring Security context
             UsernamePasswordAuthenticationToken authToken =
                     new UsernamePasswordAuthenticationToken(
                             userDetails,
                             null,
-                            userDetails instanceof ProviderDetails
-                                    ? ((ProviderDetails) userDetails).getAuthorities()
-                                    : List.of() // patients may have no authorities
+                            userDetails.getAuthorities()
                     );
 
             SecurityContextHolder.getContext().setAuthentication(authToken);

@@ -3,10 +3,11 @@ package com.emr.security;
 import com.emr.model.Patient;
 import lombok.Getter;
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.Collection;
-import java.util.Collections;
+import java.util.List;
 
 @Getter
 public class PatientDetails implements UserDetails {
@@ -19,7 +20,8 @@ public class PatientDetails implements UserDetails {
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return Collections.emptyList();
+        // Give the patient a ROLE_PATIENT authority
+        return List.of(new SimpleGrantedAuthority("ROLE_PATIENT"));
     }
 
     @Override
@@ -34,12 +36,12 @@ public class PatientDetails implements UserDetails {
 
     @Override
     public boolean isAccountNonExpired() {
-        return true;
+        return true; // adjust if you implement expiration logic
     }
 
     @Override
     public boolean isAccountNonLocked() {
-        return true;
+        return true; // adjust if you implement locking
     }
 
     @Override
@@ -49,6 +51,6 @@ public class PatientDetails implements UserDetails {
 
     @Override
     public boolean isEnabled() {
-        return true;
+        return true; // adjust if you implement enable/disable
     }
 }
